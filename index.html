@@ -4,17 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b0d12">
-<title>我的AI小手机</title>
+<title>掌上AI手机</title>
 <style>
 :root{
   --bg:#0b0d12;
-  --card:#161a22;
-  --line:#262b36;
-  --text:#e8eaf0;
-  --sub:#8b93a3;
   --green:#07c160;
   --blue:#3b82f6;
   --accent:#6c5ce7;
+  --wxbg:#ededed;
+  --wxline:#e5e5e5;
+  --txt:#191919;
+  --gray:#7f7f7f;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;}
@@ -23,190 +23,239 @@ body{
   background:#000;
   display:flex;align-items:center;justify-content:center;
   height:100vh;height:100dvh;overflow:hidden;
-  color:var(--text);
 }
 
 /* ===== 手机外壳 ===== */
 #phone{
-  position:relative;
-  width:100%;height:100%;
-  max-width:430px;
-  background:#000;
-  overflow:hidden;
-  display:flex;flex-direction:column;
+  position:relative;width:100%;height:100%;max-width:430px;
+  background:#000;overflow:hidden;display:flex;flex-direction:column;
 }
 @media(min-width:520px){
-  #phone{
-    width:400px;height:840px;max-height:94vh;
-    border-radius:44px;
-    border:8px solid #1a1c22;
-    box-shadow:0 30px 80px rgba(0,0,0,.7);
-  }
+  #phone{width:400px;height:840px;max-height:94vh;border-radius:44px;border:8px solid #1a1c22;box-shadow:0 30px 80px rgba(0,0,0,.7);}
 }
-#screen{
-  position:relative;flex:1;overflow:hidden;
-  background:var(--bg);
-}
+#screen{position:relative;flex:1;overflow:hidden;background:var(--bg);}
 
 /* ===== 状态栏 ===== */
 #statusbar{
-  position:absolute;top:0;left:0;right:0;z-index:50;
+  position:absolute;top:0;left:0;right:0;z-index:120;
   display:flex;align-items:center;justify-content:space-between;
-  padding:10px 16px 4px;font-size:12px;color:#fff;
-  pointer-events:none;
+  padding:8px 16px 2px;font-size:12px;color:#fff;pointer-events:none;
 }
 #statusbar .icons{display:flex;gap:5px;align-items:center;}
 
-/* ===== 通用：应用全屏层 ===== */
-.app{
-  position:absolute;inset:0;z-index:30;
-  display:none;flex-direction:column;
-  background:#f5f6f8;color:#111;
+/* ===== 底部虚拟导航键 ===== */
+#navbar{
+  position:absolute;bottom:0;left:0;right:0;height:52px;z-index:110;
+  display:flex;background:rgba(10,12,18,.95);
+  border-top:1px solid rgba(255,255,255,.08);
 }
-.app.active{display:flex;animation:slideIn .22s ease;}
-@keyframes slideIn{from{transform:translateX(24px);opacity:.5;}to{transform:none;opacity:1;}}
+#navbar .nbtn{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  font-size:21px;color:#d7dbe4;cursor:pointer;user-select:none;
+}
+#navbar .nbtn:active{background:rgba(255,255,255,.10);}
+#navbar .nbtn span{transform:scaleX(1.15);}
+
+/* ===== 应用层（底部让出导航条） ===== */
+.app,.app.overlayed{
+  position:absolute;left:0;right:0;top:0;bottom:52px;
+  display:none;flex-direction:column;
+  background:var(--wxbg);color:var(--txt);z-index:30;
+}
+.app.active{display:flex;animation:slideIn .2s ease;}
+@keyframes slideIn{from{transform:translateX(18px);opacity:.4;}to{transform:none;opacity:1;}}
+.app.dark{background:var(--bg);}
+
+/* 顶栏 */
 .appbar{
   display:flex;align-items:center;gap:10px;
-  padding:44px 14px 12px;background:#fff;
-  border-bottom:1px solid #eee;flex-shrink:0;
+  padding:40px 12px 10px;background:#f7f7f7;
+  border-bottom:1px solid #e0e0e0;flex-shrink:0;
 }
-.appbar .back{font-size:20px;padding:2px 6px;cursor:pointer;color:#111;}
-.appbar .title{font-size:17px;font-weight:600;flex:1;}
-.appbar .act{font-size:18px;cursor:pointer;color:var(--green);padding:2px 6px;}
+.appbar .back{font-size:22px;line-height:1;padding:2px 8px;color:#191919;cursor:pointer;user-select:none;}
+.appbar .title{font-size:17px;font-weight:600;flex:1;text-align:left;}
+.appbar .act{font-size:18px;padding:2px 8px;color:#191919;cursor:pointer;user-select:none;}
+.appbar .act.green{color:var(--green);font-weight:600;}
+.app.dark .appbar,.appbar.dark{background:#1b1e27;border-bottom:1px solid #262b36;}
+.app.dark .appbar .back,.app.dark .appbar .title,.app.dark .appbar .act{color:#e8eaf0;}
 
 /* ===== 桌面 ===== */
 #home{
-  position:absolute;inset:0;z-index:10;
+  position:absolute;left:0;right:0;top:0;bottom:52px;z-index:10;
   background:
-    radial-gradient(120% 80% at 20% 0%, #3b2f6e 0%, transparent 55%),
-    radial-gradient(120% 80% at 100% 20%, #1d4e63 0%, transparent 50%),
-    linear-gradient(160deg,#141926 0%,#0b0d12 70%);
-  padding:56px 20px 20px;
+    radial-gradient(130% 90% at 15% -5%, #4a3b8f 0%, transparent 55%),
+    radial-gradient(120% 90% at 105% 15%, #14506b 0%, transparent 52%),
+    radial-gradient(100% 70% at 50% 115%, #27364f 0%, transparent 60%),
+    linear-gradient(165deg,#171c2b 0%,#0a0c11 75%);
+  padding:58px 18px 16px;
   display:flex;flex-direction:column;
 }
-#appgrid{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  gap:22px 8px;margin-top:8px;
-}
-.appicon{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;}
+#appgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px 6px;margin-top:10px;}
+.appicon{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;user-select:none;}
 .appicon .ico{
-  width:56px;height:56px;border-radius:15px;
+  width:58px;height:58px;border-radius:16px;
   display:flex;align-items:center;justify-content:center;
-  font-size:28px;background:linear-gradient(145deg,rgba(255,255,255,.16),rgba(255,255,255,.04));
-  border:1px solid rgba(255,255,255,.1);
-  box-shadow:0 6px 16px rgba(0,0,0,.35);
+  font-size:30px;
+  box-shadow:0 8px 18px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.25);
+  transition:transform .13s ease;
 }
-.appicon .name{font-size:11px;color:#dde1ea;}
+.appicon:active .ico{transform:scale(.86);}
+.appicon .name{font-size:11.5px;color:#e8ebf2;text-shadow:0 1px 3px rgba(0,0,0,.6);}
+#clock{font-size:40px;font-weight:200;color:#fff;margin-bottom:2px;text-shadow:0 2px 10px rgba(0,0,0,.4);}
+#date{font-size:13px;color:#c9cfdd;margin-bottom:6px;}
 #dock{
   margin-top:auto;
   background:rgba(255,255,255,.10);
-  border:1px solid rgba(255,255,255,.12);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border-radius:22px;padding:10px 12px;
+  border:1px solid rgba(255,255,255,.14);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-radius:24px;padding:10px 14px;
   display:flex;justify-content:space-around;
 }
-#clock{font-size:38px;font-weight:200;color:#fff;margin-bottom:2px;}
-#date{font-size:13px;color:#b9c0cd;}
 
-/* ===== 聊天（微信风） ===== */
-#app-chat{background:#ededed;}
-.chat-tabs{display:flex;background:#f7f7f7;border-top:1px solid #eee;}
-.chat-tabs div{flex:1;text-align:center;padding:11px 0;font-size:14px;color:#888;cursor:pointer;position:relative;}
-.chat-tabs div.on{color:#111;font-weight:600;}
-.chat-tabs div.on::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:22px;height:3px;background:var(--green);border-radius:2px;}
-.chat-pane{flex:1;overflow-y:auto;display:none;background:#fff;}
+/* ===== 微信通用组件 ===== */
+.chat-tabs{display:flex;background:#fff;border-top:1px solid var(--wxline);flex-shrink:0;}
+.chat-tabs .tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:6px 0 5px;color:#8a8a8a;cursor:pointer;user-select:none;position:relative;
+}
+.chat-tabs .tab .ti{font-size:20px;line-height:1;filter:grayscale(1) opacity(.75);}
+.chat-tabs .tab .tt{font-size:10px;}
+.chat-tabs .tab.on{color:var(--green);}
+.chat-tabs .tab.on .ti{filter:none;}
+.chat-pane{flex:1;overflow-y:auto;display:none;background:var(--wxbg);}
 .chat-pane.on{display:block;}
-.conv{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid #f2f2f2;cursor:pointer;}
-.conv:active{background:#f5f5f5;}
-.conv .av{width:46px;height:46px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px;background:#e8e8f0;}
+
+.conv{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-bottom:.5px solid #f0f0f0;cursor:pointer;}
+.conv:active{background:#f0f0f0;}
+.conv .av{width:47px;height:47px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px;background:#e3e6ef;}
 .conv .mid{flex:1;min-width:0;}
-.conv .mid .top{display:flex;justify-content:space-between;align-items:center;}
-.conv .mid .name{font-size:15px;color:#111;}
-.conv .mid .time{font-size:11px;color:#b0b0b0;}
-.conv .mid .pre{font-size:13px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
-.badge{background:#fa5151;color:#fff;font-size:10px;border-radius:9px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 5px;}
-.role-cell{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid #f2f2f2;cursor:pointer;}
-.role-cell .av{width:42px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;background:#e8e8f0;}
-.role-cell .name{font-size:15px;color:#111;}
-.role-cell .desc{font-size:12px;color:#999;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px;}
-.sec-label{font-size:12px;color:#999;padding:12px 14px 4px;}
+.conv .mid .top{display:flex;justify-content:space-between;align-items:baseline;}
+.conv .mid .name{font-size:16px;color:var(--txt);}
+.conv .mid .time{font-size:11px;color:#b2b2b2;}
+.conv .mid .pre{font-size:13.5px;color:#9c9c9c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px;}
+
+.role-cell{display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border-bottom:.5px solid #f0f0f0;cursor:pointer;}
+.role-cell:active{background:#f0f0f0;}
+.role-cell .av{width:42px;height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;background:#e3e6ef;flex-shrink:0;}
+.role-cell .rname{font-size:15.5px;color:var(--txt);}
+.role-cell .rdesc{font-size:12px;color:#a5a5a5;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+.wx-search{padding:8px 10px;background:var(--wxbg);position:sticky;top:0;z-index:5;}
+.wx-search input{width:100%;background:#fff;border:none;border-radius:7px;padding:8px 12px;font-size:14px;outline:none;}
+
+.cell{display:flex;align-items:center;gap:12px;padding:13px 14px;background:#fff;cursor:pointer;border-bottom:.5px solid #f2f2f2;user-select:none;}
+.cell:active{background:#f0f0f0;}
+.cell:last-child{border-bottom:none;}
+.cell .cbox{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;flex-shrink:0;}
+.cell .ct{flex:1;font-size:15.5px;color:var(--txt);}
+.cell .arr{color:#c8c8c8;font-size:18px;}
+.menu-group{margin-top:8px;}
+.sec-label{font-size:12.5px;color:#9a9a9a;padding:10px 14px 5px;}
+
+/* 我页 */
+.me-card{display:flex;align-items:center;gap:14px;padding:22px 16px;background:#fff;cursor:pointer;}
+.me-card:active{background:#f0f0f0;}
+.me-card .mav{width:58px;height:58px;border-radius:8px;background:#e3e6ef;display:flex;align-items:center;justify-content:center;font-size:32px;}
+.me-card .mname{font-size:20px;font-weight:600;color:var(--txt);}
+.me-card .mwxid{font-size:13px;color:#9a9a9a;margin-top:3px;}
+.me-card .arr{margin-left:auto;color:#c8c8c8;font-size:20px;}
+
 /* 聊天详情 */
-.chat-body{flex:1;overflow-y:auto;background:#ededed;padding:12px;}
+.chat-body{flex:1;overflow-y:auto;background:var(--wxbg);padding:10px 10px 14px;}
+.time-line{text-align:center;font-size:11.5px;color:#b2b2b2;margin:10px 0 12px;}
 .msg{display:flex;margin-bottom:14px;align-items:flex-start;}
-.msg .av{width:36px;height:36px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;background:#dcdce6;}
+.msg .av{width:38px;height:38px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px;background:#e3e6ef;}
 .msg.me{flex-direction:row-reverse;}
-.msg.me .av{background:#d0f0dd;}
-.bubble{max-width:70%;padding:9px 12px;border-radius:6px;font-size:15px;line-height:1.5;word-break:break-word;white-space:pre-wrap;}
-.msg.ai .bubble{background:#fff;margin-left:8px;border-radius:2px 10px 10px 10px;}
-.msg.me .bubble{background:#95ec69;margin-right:8px;border-radius:10px 2px 10px 10px;}
+.bubble{max-width:72%;padding:9px 12px;border-radius:5px;font-size:15.5px;line-height:1.55;word-break:break-word;white-space:pre-wrap;}
+.msg.ai .bubble{background:#fff;margin-left:9px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+.msg.me .bubble{background:#95ec69;margin-right:9px;}
 .msg .cursor{display:inline-block;width:7px;height:15px;background:var(--green);vertical-align:-2px;animation:blink 1s steps(1) infinite;}
 @keyframes blink{50%{opacity:0;}}
 .typing{color:#999;font-size:13px;}
-.chat-input{display:flex;gap:8px;padding:8px 10px;background:#f7f7f7;border-top:1px solid #eee;align-items:flex-end;}
-.chat-input textarea{flex:1;border:none;outline:none;background:#fff;border-radius:6px;padding:9px 12px;font-size:15px;resize:none;max-height:90px;font-family:inherit;}
-.chat-input button{border:none;background:var(--green);color:#fff;border-radius:6px;padding:9px 16px;font-size:14px;cursor:pointer;flex-shrink:0;}
+.chat-input{display:flex;gap:8px;padding:7px 9px;background:#f7f7f7;border-top:1px solid var(--wxline);align-items:flex-end;}
+.chat-input textarea{flex:1;border:none;outline:none;background:#fff;border-radius:6px;padding:9px 12px;font-size:15.5px;resize:none;max-height:90px;font-family:inherit;}
+.chat-input button{border:none;background:var(--green);color:#fff;border-radius:6px;padding:9px 16px;font-size:14.5px;cursor:pointer;flex-shrink:0;font-weight:500;}
 
-/* ===== 表单 / 通用 ===== */
+/* 表单/按钮 */
 .field{margin-bottom:14px;}
-.field label{display:block;font-size:13px;color:#666;margin-bottom:6px;}
-.field input,.field textarea,.field select{
-  width:100%;border:1px solid #ddd;border-radius:8px;padding:10px 12px;font-size:14px;outline:none;font-family:inherit;background:#fff;
+.field label{display:block;font-size:13px;color:#7a7a7a;margin-bottom:6px;}
+.field input,.field textarea{
+  width:100%;border:none;border-radius:8px;padding:11px 12px;font-size:14.5px;outline:none;font-family:inherit;background:#fff;
 }
-.field input:focus,.field textarea:focus{border-color:var(--green);}
-.panel{flex:1;overflow-y:auto;padding:16px;background:#f5f6f8;}
-.btn{display:block;width:100%;text-align:center;background:var(--green);color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;cursor:pointer;margin-top:6px;}
+.panel{flex:1;overflow-y:auto;padding:14px;}
+.btn{display:block;width:100%;text-align:center;background:var(--green);color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;cursor:pointer;margin-top:8px;font-weight:500;user-select:none;}
 .btn.gray{background:#e6e6e6;color:#333;}
 .btn.blue{background:var(--blue);}
 .btn.warn{background:#fa5151;}
-.hint{font-size:12px;color:#999;line-height:1.6;margin-top:8px;}
-.card{background:#fff;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
-.empty{text-align:center;color:#bbb;padding:50px 20px;font-size:14px;}
-.empty .eico{font-size:40px;margin-bottom:10px;}
+.btn.small{width:auto;display:inline-block;padding:8px 14px;margin:0;font-size:13px;}
+.btn:disabled{opacity:.55;}
+.hint{font-size:12.5px;color:#989898;line-height:1.65;margin-top:8px;}
+.empty{text-align:center;color:#b5b5b5;padding:60px 20px;font-size:14px;}
+.empty .eico{font-size:44px;margin-bottom:12px;filter:grayscale(.4);}
 
-/* ===== 商城 ===== */
+/* 商城 */
 #app-shop{background:#f5f6f8;}
-.shop-top{background:var(--accent);color:#fff;padding:44px 16px 16px;}
+.shop-top{background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;padding:44px 16px 16px;}
 .coin-row{display:flex;align-items:center;gap:6px;font-size:14px;}
-.coin-row .coin{font-size:18px;}
 .goods-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px;}
-.goods{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);cursor:pointer;}
-.goods .gimg{height:120px;background:linear-gradient(135deg,#e0e7ff,#fce7f3);display:flex;align-items:center;justify-content:center;font-size:46px;}
+.goods{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);cursor:pointer;}
+.goods:active{transform:scale(.98);}
+.goods .gimg{height:110px;background:linear-gradient(135deg,#e0e7ff,#fce7f3);display:flex;align-items:center;justify-content:center;font-size:44px;}
 .goods .gname{font-size:13px;color:#333;padding:8px 10px 2px;}
 .goods .gprice{font-size:14px;color:#fa5151;font-weight:600;padding:0 10px 10px;}
-.goods .gprice .coin{font-size:12px;}
-.cart-row{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fff;border-bottom:1px solid #f2f2f2;}
-.cart-row .qty{display:flex;align-items:center;gap:8px;margin-left:auto;}
-.cart-row .qty button{width:26px;height:26px;border-radius:50%;border:1px solid #ddd;background:#fff;cursor:pointer;}
+.cart-row{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fff;border-bottom:.5px solid #f0f0f0;}
+.cart-row .qty{display:flex;align-items:center;gap:10px;margin-left:auto;}
+.cart-row .qty button{width:26px;height:26px;border-radius:50%;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:14px;}
 
-/* ===== 相册 ===== */
+/* 相册/媒体 */
 .gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;}
 .gal-grid .ph{aspect-ratio:1;background:#ddd;background-size:cover;background-position:center;border-radius:3px;cursor:pointer;}
-.gal-add{aspect-ratio:1;border:2px dashed #ccc;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#aaa;font-size:12px;cursor:pointer;gap:4px;}
-
-/* ===== 音乐/视频 列表 ===== */
-.media-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-bottom:1px solid #f2f2f2;cursor:pointer;}
-.media-item .mic{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#6c5ce7,#74b9ff);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;}
-.media-item .name{font-size:14px;color:#222;}
-.media-item .sub{font-size:12px;color:#999;}
-.media-item.playing .mic{animation:pulse 1s ease infinite;}
-@keyframes pulse{50%{transform:scale(1.1);}}
-#player{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#111;color:#fff;padding:12px 16px;display:none;align-items:center;gap:12px;z-index:60;}
-#player .pt{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gal-add{aspect-ratio:1;border:2px dashed #c5c5c5;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#aaa;font-size:12px;cursor:pointer;gap:4px;background:#fff;}
+.media-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-bottom:.5px solid #f0f0f0;cursor:pointer;}
+.media-item:active{background:#f0f0f0;}
+.media-item .mic{width:42px;height:42px;border-radius:9px;background:linear-gradient(135deg,#6c5ce7,#74b9ff);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0;}
+.media-item .name{font-size:14.5px;color:#222;}
+.media-item .sub{font-size:12px;color:#999;margin-top:2px;}
+#player{position:absolute;bottom:60px;left:10px;right:10px;background:rgba(20,22,30,.95);color:#fff;padding:10px 14px;display:none;align-items:center;gap:12px;border-radius:12px;z-index:105;backdrop-filter:blur(8px);}
+#player .pt{font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 #player button{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;}
-video.vfull{width:100%;max-height:46vh;background:#000;}
 
-/* ===== 游戏 ===== */
-.game-list .gcard{display:flex;align-items:center;gap:14px;background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+/* 游戏 */
+.game-list .gcard{display:flex;align-items:center;gap:14px;background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.game-list .gcard:active{transform:scale(.98);}
 .game-list .gcard .gico{font-size:32px;}
 .game-list .gcard .gname{font-size:16px;color:#222;font-weight:600;}
 .game-list .gcard .gsub{font-size:12px;color:#999;margin-top:2px;}
-canvas#snake{background:#111;display:block;margin:0 auto;border-radius:8px;}
+canvas#snake{background:#111;display:block;margin:0 auto;border-radius:10px;}
 #grid2048{position:relative;background:#bbada0;border-radius:8px;width:300px;height:300px;margin:0 auto;padding:10px;}
-.tile{position:absolute;width:62px;height:62px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#776e65;background:#cdc1b4;transition:left .1s,top .1s;}
+.tile{position:absolute;width:62px;height:62px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#776e65;background:#cdc1b4;}
 #score2048{text-align:center;font-size:16px;color:#666;margin:10px 0;}
 .game-hint{text-align:center;color:#999;font-size:13px;margin-top:10px;}
-</style></head>
-<body>
+
+/* 后台最近任务 */
+#recents{
+  position:absolute;inset:0;z-index:100;display:none;flex-direction:column;
+  background:rgba(8,10,15,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  padding:70px 20px 70px;
+}
+#recents.on{display:flex;}
+#recents .rt{color:#cdd3de;font-size:14px;text-align:center;margin-bottom:18px;}
+#recents .rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 10px;overflow-y:auto;}
+#recents .rcard{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;}
+#recents .rcard .rico{width:62px;height:62px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 10px 22px rgba(0,0,0,.5);}
+#recents .rcard:active .rico{transform:scale(.9);}
+#recents .rcard .rname{font-size:11.5px;color:#dfe3ec;}
+#recents .rempty{color:#7c828e;text-align:center;margin:auto;font-size:14px;}
+#recents .rfoot{color:#8b91a0;font-size:12px;text-align:center;margin-top:auto;}
+
+/* toast */
+#toast{
+  position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);
+  background:rgba(0,0,0,.78);color:#fff;padding:11px 18px;border-radius:9px;
+  font-size:14px;display:none;z-index:200;max-width:72%;text-align:center;line-height:1.5;
+}
+</style>
+</head><body>
 <div id="phone">
   <div id="screen">
     <div id="statusbar">
@@ -222,22 +271,24 @@ canvas#snake{background:#111;display:block;margin:0 auto;border-radius:8px;}
       <div id="dock"></div>
     </div>
 
-    <!-- AI聊天 -->
+    <!-- 微信 -->
     <div id="app-chat" class="app">
-      <div class="appbar"><span class="back" onclick="closeApp()">‹</span><span class="title">AI聊天</span><span class="act" onclick="newChat()">＋</span></div>
+      <div class="appbar"><span class="title">微信</span><span class="act" onclick="toast('搜索功能开发中')">🔍</span><span class="act green" onclick="editRole(null)">＋</span></div>
       <div class="chat-pane on" id="pane-msg"></div>
-      <div class="chat-pane" id="pane-roles"></div>
+      <div class="chat-pane" id="pane-contacts"></div>
+      <div class="chat-pane" id="pane-discover"></div>
       <div class="chat-pane" id="pane-me"></div>
       <div class="chat-tabs">
-        <div class="on" onclick="switchTab('msg')">消息</div>
-        <div onclick="switchTab('roles')">联系人</div>
-        <div onclick="switchTab('me')">我的</div>
+        <div class="tab on" onclick="switchTab('msg')"><span class="ti">💬</span><span class="tt">微信</span></div>
+        <div class="tab" onclick="switchTab('contacts')"><span class="ti">👥</span><span class="tt">通讯录</span></div>
+        <div class="tab" onclick="switchTab('discover')"><span class="ti">🧭</span><span class="tt">发现</span></div>
+        <div class="tab" onclick="switchTab('me')"><span class="ti">👤</span><span class="tt">我</span></div>
       </div>
     </div>
 
     <!-- 聊天详情 -->
     <div id="app-chatdetail" class="app">
-      <div class="appbar"><span class="back" onclick="backToList()">‹</span><span class="title" id="cd-title"></span></div>
+      <div class="appbar"><span class="back" onclick="goBack()">‹</span><span class="title" id="cd-title"></span><span class="act" onclick="editRole(curRoleId)">···</span></div>
       <div class="chat-body" id="cd-body"></div>
       <div class="chat-input">
         <textarea id="cd-input" rows="1" placeholder="发送消息"></textarea>
@@ -245,44 +296,59 @@ canvas#snake{background:#111;display:block;margin:0 auto;border-radius:8px;}
       </div>
     </div>
 
-    <!-- 新建角色 -->
+    <!-- 新建/编辑角色 -->
     <div id="app-roledit" class="app">
-      <div class="appbar"><span class="back" onclick="backToRoles()">‹</span><span class="title" id="re-title">新建角色</span><span class="act" onclick="saveRole()">保存</span></div>
+      <div class="appbar"><span class="back" onclick="goBack()">‹</span><span class="title" id="re-title">新建角色</span><span class="act green" onclick="saveRole()">保存</span></div>
       <div class="panel">
-        <div class="field"><label>名字</label><input id="re-name" placeholder="例如：温柔学姐"></div>
-        <div class="field"><label>头像（emoji）</label><input id="re-avatar" placeholder="例如：🌸" value="🤖"></div>
-        <div class="field"><label>人设描述（系统提示词）</label><textarea id="re-prompt" rows="4" placeholder="例如：你是一位温柔耐心的学姐，说话亲切，喜欢用～结尾"></textarea></div>
+        <div class="field"><label>名字</label><input id="re-name" placeholder="例如：小雪"></div>
+        <div class="field"><label>头像（emoji 或字符）</label><input id="re-avatar" value="🤖"></div>
+        <div class="field"><label>微信号（选填，展示用）</label><input id="re-wxid" placeholder="例如：wx_xiaoxue"></div>
+        <div class="field"><label>人设描述（系统提示词）</label><textarea id="re-prompt" rows="4" placeholder="例如：你是温柔的闺蜜小雪，说话贴心，喜欢用～结尾"></textarea></div>
         <div class="field"><label>开场白</label><textarea id="re-greeting" rows="2" placeholder="例如：嗨～你来啦，今天想聊点什么？"></textarea></div>
         <button class="btn" onclick="saveRole()">保存角色</button>
+      </div>
+    </div>
+
+    <!-- 个人信息 -->
+    <div id="app-profile" class="app">
+      <div class="appbar"><span class="back" onclick="goBack()">‹</span><span class="title">个人信息</span><span class="act green" onclick="saveProfile()">保存</span></div>
+      <div class="panel">
+        <div class="field"><label>我的头像（emoji 或字符）</label><input id="pf-avatar" value="🙂"></div>
+        <div class="field"><label>昵称</label><input id="pf-name" placeholder="我的昵称"></div>
+        <div class="field"><label>微信号</label><input id="pf-wxid" placeholder="wx_xxx"></div>
+        <div class="field"><label>个性签名</label><input id="pf-sign" placeholder="介绍一下自己吧"></div>
+        <button class="btn" onclick="saveProfile()">保存</button>
+        <div class="hint">头像、昵称、微信号会显示在「我」页面和聊天中的自己头像上。</div>
       </div>
     </div>
 
     <!-- 商城 -->
     <div id="app-shop" class="app">
       <div class="shop-top">
-        <div class="coin-row">👛 <b id="shop-coin">1000</b><span style="font-size:12px">金币</span></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span onclick="goHome()" style="color:#fff;font-size:22px;cursor:pointer;">◁</span>
+          <div class="coin-row">👛 <b id="shop-coin">1000</b><span style="font-size:12px">金币</span></div>
+        </div>
       </div>
       <div class="goods-grid" id="shop-goods"></div>
       <div class="chat-tabs" style="flex-shrink:0">
-        <div class="on" onclick="shopTab('goods')">首页</div>
-        <div onclick="shopTab('cart')">购物车</div>
+        <div class="tab on" onclick="shopTab('goods')"><span class="ti">🛍️</span><span class="tt">首页</span></div>
+        <div class="tab" onclick="shopTab('cart')"><span class="ti">🛒</span><span class="tt">购物车</span></div>
       </div>
     </div>
 
     <!-- 相册 -->
     <div id="app-gallery" class="app">
-      <div class="appbar"><span class="back" onclick="closeApp()">‹</span><span class="title">相册</span></div>
+      <div class="appbar"><span class="back" onclick="goHome()">◁</span><span class="title">相册</span></div>
       <div class="panel">
         <input type="file" id="gal-file" accept="image/*" multiple style="display:none">
-        <div class="gal-grid" id="gal-grid">
-          <div class="gal-add" onclick="document.getElementById('gal-file').click()"><span style="font-size:26px">＋</span>添加照片</div>
-        </div>
+        <div class="gal-grid" id="gal-grid"></div>
       </div>
     </div>
 
     <!-- 音乐 -->
     <div id="app-music" class="app">
-      <div class="appbar"><span class="back" onclick="closeApp()">‹</span><span class="title">音乐</span></div>
+      <div class="appbar"><span class="back" onclick="goHome()">◁</span><span class="title">音乐</span></div>
       <div class="panel" style="padding:0">
         <input type="file" id="music-file" accept="audio/*" style="display:none">
         <div class="sec-label">🎧 在线音乐（免费素材）</div>
@@ -294,7 +360,7 @@ canvas#snake{background:#111;display:block;margin:0 auto;border-radius:8px;}
 
     <!-- 视频 -->
     <div id="app-video" class="app">
-      <div class="appbar"><span class="back" onclick="closeApp()">‹</span><span class="title">视频</span></div>
+      <div class="appbar"><span class="back" onclick="goHome()">◁</span><span class="title">视频</span></div>
       <div class="panel" style="padding:0">
         <input type="file" id="video-file" accept="video/*" style="display:none">
         <div class="sec-label">🎬 在线视频（免费素材）</div>
@@ -304,27 +370,27 @@ canvas#snake{background:#111;display:block;margin:0 auto;border-radius:8px;}
       </div>
     </div>
 
-    <!-- 游戏 -->
+    <!-- 游戏中心 -->
     <div id="app-games" class="app">
-      <div class="appbar"><span class="back" onclick="closeApp()">‹</span><span class="title">游戏中心</span></div>
+      <div class="appbar"><span class="back" onclick="goHome()">◁</span><span class="title">游戏中心</span></div>
       <div class="panel game-list">
-        <div class="gcard" onclick="openGame('snake')"><div class="gico">🐍</div><div><div class="gname">贪吃蛇</div><div class="gsub">经典小游戏</div></div></div>
-        <div class="gcard" onclick="openGame('2048')"><div class="gico">🔢</div><div><div class="gname">2048</div><div class="gsub">数字合成</div></div></div>
+        <div class="gcard" onclick="openGame('snake')"><div class="gico">🐍</div><div><div class="gname">贪吃蛇</div><div class="gsub">经典小游戏 · 滑动控制</div></div></div>
+        <div class="gcard" onclick="openGame('2048')"><div class="gico">🔢</div><div><div class="gname">2048</div><div class="gsub">数字合成 · 滑动合并</div></div></div>
       </div>
     </div>
 
-    <!-- 游戏：贪吃蛇 -->
+    <!-- 贪吃蛇 -->
     <div id="app-snake" class="app">
-      <div class="appbar"><span class="back" onclick="backToGames()">‹</span><span class="title">贪吃蛇</span><span class="act" id="snake-score">0分</span></div>
+      <div class="appbar"><span class="back" onclick="goBack()">‹</span><span class="title">贪吃蛇</span><span class="act" id="snake-score">0分</span></div>
       <div class="panel" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
         <canvas id="snake" width="320" height="320"></canvas>
-        <div class="game-hint">滑动屏幕控制方向，吃到食物加分</div>
+        <div class="game-hint">在屏幕上滑动控制方向</div>
       </div>
     </div>
 
-    <!-- 游戏：2048 -->
+    <!-- 2048 -->
     <div id="app-2048" class="app">
-      <div class="appbar"><span class="back" onclick="backToGames()">‹</span><span class="title">2048</span><span class="act" onclick="reset2048()">重开</span></div>
+      <div class="appbar"><span class="back" onclick="goBack()">‹</span><span class="title">2048</span><span class="act" onclick="reset2048()">重开</span></div>
       <div class="panel">
         <div id="score2048">分数：0</div>
         <div id="grid2048"></div>
@@ -332,11 +398,11 @@ canvas#snake{background:#111;display:block;margin:0 auto;border-radius:8px;}
       </div>
     </div>
 
-    <!-- 设置 -->
+    <!-- 设置（服务商管理） -->
     <div id="app-settings" class="app">
-      <div class="appbar"><span class="back" onclick="closeApp()">‹</span><span class="title">我的 · 服务商配置</span></div>
+      <div class="appbar"><span class="back" onclick="goHome()">◁</span><span class="title">设置 · 模型服务商</span></div>
       <div class="panel">
-        <div class="hint" style="margin-bottom:12px">配置大模型服务商后，AI聊天才能用。支持 DeepSeek 官方和各类 OpenAI 兼容中转站。配置只保存在你自己手机浏览器里。</div>
+        <div class="hint" style="margin-bottom:12px">配置大模型服务商后，「微信」里的 AI 好友才能回复。支持 DeepSeek 官方和各类 OpenAI 兼容中转站。配置只保存在本机浏览器里，不会上传。</div>
         <div id="svc-list"></div>
         <button class="btn blue" onclick="editService(null)">＋ 添加服务商</button>
       </div>
@@ -344,15 +410,32 @@ canvas#snake{background:#111;display:block;margin:0 auto;border-radius:8px;}
 
     <!-- 服务商编辑 -->
     <div id="app-svcedit" class="app">
-      <div class="appbar"><span class="back" onclick="backToSvc()">‹</span><span class="title" id="svc-title">添加服务商</span><span class="act" onclick="saveService()">保存</span></div>
+      <div class="appbar"><span class="back" onclick="goBack()">‹</span><span class="title" id="svc-title">添加服务商</span><span class="act green" onclick="saveService()">保存</span></div>
       <div class="panel">
         <div class="field"><label>服务商名称</label><input id="svc-name" placeholder="例如：DeepSeek / 基元律动"></div>
         <div class="field"><label>接口地址 Base URL</label><input id="svc-url" placeholder="https://api.deepseek.com"></div>
         <div class="field"><label>API Key</label><input id="svc-key" placeholder="sk-..."></div>
         <div class="field"><label>模型名</label><input id="svc-model" placeholder="deepseek-chat"></div>
-        <div class="hint">Base URL 填到域名即可，如 https://api.deepseek.com（系统会自动补 /chat/completions）。中转站一般会给接口地址和模型名，照填即可。</div>
-        <button class="btn" onclick="saveService()">保存</button>
+        <button class="btn blue" id="svc-test-btn" onclick="testService()">🔌 测试连接</button>
+        <div class="hint" id="svc-test-result"></div>
+        <div class="hint">Base URL 填到域名即可（自动补 /chat/completions）。中转站会给接口地址、Key 和模型名，照填即可。</div>
+        <button class="btn" onclick="saveService()">保存服务商</button>
       </div>
+    </div>
+
+    <!-- 底部虚拟导航键 -->
+    <div id="navbar">
+      <div class="nbtn" onclick="goBack()"><span>◁</span></div>
+      <div class="nbtn" onclick="goHome()"><span>○</span></div>
+      <div class="nbtn" onclick="showRecents()"><span>□</span></div>
+    </div>
+
+    <!-- 后台最近任务 -->
+    <div id="recents">
+      <div class="rt">最近使用</div>
+      <div class="rgrid" id="recents-grid"></div>
+      <div class="rempty" id="recents-empty" style="display:none">暂无最近使用的应用</div>
+      <div class="rfoot">点击卡片切换应用 · 按 ○ 返回桌面</div>
     </div>
 
     <audio id="audio"></audio>
@@ -360,151 +443,299 @@ canvas#snake{background:#111;display:block;margin:0 auto;border-radius:8px;}
       <div class="pt" id="player-title">正在播放</div>
       <button id="player-btn" onclick="togglePlay()">⏸</button>
     </div>
+
+    <div id="toast"></div>
   </div>
 </div><script>
 /* ========== 数据层 ========== */
-var LSKEY='aiphone_v1';
+var LSKEY='aiphone_v2';
 function load(){try{return JSON.parse(localStorage.getItem(LSKEY))||{};}catch(e){return{};}}
 function save(d){localStorage.setItem(LSKEY,JSON.stringify(d));}
 var db=load();
 function def(o,k,v){if(o[k]===undefined){o[k]=v;}}
 def(db,'services',[]);
 def(db,'roles',[]);
-def(db,'chats',{});      // roleId -> {messages:[{role,content,time}]}
+def(db,'chats',{});   // roleId -> {messages:[{role,content,time}]}
 def(db,'coins',1000);
-def(db,'cart',[]);       // [{id,name,emoji,price,qty}]
-def(db,'gallery',[]);    // dataURL 数组
+def(db,'cart',[]);
+def(db,'gallery',[]);
 def(db,'orders',[]);
+def(db,'profile',{name:'我',wxid:'wx_'+Math.random().toString(36).slice(2,8),avatar:'🙂',sign:''});
 save(db);
+
+/* ========== 通用工具 ========== */
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+var toastTimer=null;
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){t.style.display='none';},1700);
+}
+function fmtTime(ts){
+  var d=new Date(ts);var h=d.getHours(),m=d.getMinutes();
+  return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+}
+function fmtChatTime(ts){
+  var d=new Date(ts);
+  return (d.getMonth()+1)+'月'+d.getDate()+'日 '+fmtTime(ts);
+}
+function normUrl(u){
+  u=u.trim().replace(/\/+$/,'');
+  if(/\/chat\/completions$/.test(u))return u;
+  if(/\/v1$/.test(u))return u+'/chat/completions';
+  return u+'/chat/completions';
+}
+
+/* ========== 导航系统（回退/主页/后台） ========== */
+var currentApp=null;
+var navStack=[];
+var recents=[];
+var TOPAPPS=['chat','shop','gallery','music','video','games','settings'];
+function openApp(id){
+  hideRecents();
+  if(currentApp===id){renderApp(id);return;}
+  if(currentApp){navStack.push(currentApp);if(navStack.length>25)navStack.shift();}
+  currentApp=id;
+  if(TOPAPPS.indexOf(id)>=0){recents=[id].concat(recents.filter(function(x){return x!==id;})).slice(0,9);}
+  renderApp(id);
+}
+function jumpTo(id){
+  hideRecents();
+  currentApp=id;
+  renderApp(id);
+}
+function goBack(){
+  var prev=navStack.pop();
+  if(prev){jumpTo(prev);}else{goHome();}
+}
+function goHome(){
+  hideRecents();
+  navStack=[];
+  currentApp=null;
+  document.querySelectorAll('.app').forEach(function(e){e.classList.remove('active');});
+  /* 回桌面不停止音乐（像真的手机） */
+}
+function showRecents(){
+  var box=document.getElementById('recents');
+  var grid=document.getElementById('recents-grid');
+  var empty=document.getElementById('recents-empty');
+  grid.innerHTML='';
+  var list=recents.slice();
+  if(!list.length){empty.style.display='block';}
+  else{
+    empty.style.display='none';
+    list.forEach(function(id){
+      var a=null;
+      for(var i=0;i<APP_ICONS.length;i++){if(APP_ICONS[i].id===id){a=APP_ICONS[i];break;}}
+      if(!a)return;
+      var d=document.createElement('div');d.className='rcard';
+      d.innerHTML='<div class="rico" style="background:'+a.bg+'">'+a.emoji+'</div><div class="rname">'+a.name+'</div>';
+      d.onclick=function(){jumpTo(id);};
+      grid.appendChild(d);
+    });
+  }
+  box.classList.add('on');
+}
+function hideRecents(){document.getElementById('recents').classList.remove('on');}
+function renderApp(id){
+  document.querySelectorAll('.app').forEach(function(e){e.classList.remove('active');});
+  var el=document.getElementById('app-'+id);
+  if(el)el.classList.add('active');
+  if(id==='chat'){switchTab(chatTab);}
+  else if(id==='shop'){renderShop();}
+  else if(id==='gallery'){renderGallery();}
+  else if(id==='music'){renderMusic();}
+  else if(id==='video'){renderVideo();}
+  else if(id==='settings'){renderServices();}
+  else if(id==='chatdetail'){renderChatMsgs();}
+}
 
 /* ========== 桌面 ========== */
 var APP_ICONS=[
-  {id:'chat',name:'AI聊天',emoji:'💬'},
-  {id:'shop',name:'商城',emoji:'🛍️'},
-  {id:'gallery',name:'相册',emoji:'📷'},
-  {id:'music',name:'音乐',emoji:'🎵'},
-  {id:'video',name:'视频',emoji:'🎬'},
-  {id:'games',name:'游戏',emoji:'🎮'},
-  {id:'settings',name:'设置',emoji:'⚙️'}
+  {id:'chat',name:'微信',emoji:'💬',bg:'linear-gradient(145deg,#4ce07f,#07c160)'},
+  {id:'shop',name:'商城',emoji:'🛍️',bg:'linear-gradient(145deg,#ff9a9e,#f6416c)'},
+  {id:'gallery',name:'相册',emoji:'📷',bg:'linear-gradient(145deg,#9fc5ff,#3b82f6)'},
+  {id:'music',name:'音乐',emoji:'🎵',bg:'linear-gradient(145deg,#fbc2eb,#a18cd1)'},
+  {id:'video',name:'视频',emoji:'🎬',bg:'linear-gradient(145deg,#f6d365,#fda085)'},
+  {id:'games',name:'游戏',emoji:'🎮',bg:'linear-gradient(145deg,#84fab0,#54a0ff)'},
+  {id:'settings',name:'设置',emoji:'⚙️',bg:'linear-gradient(145deg,#cfd9df,#718093)'}
 ];
 var DOCK_ICONS=['chat','shop','games'];
 function renderHome(){
   var g=document.getElementById('appgrid');g.innerHTML='';
   APP_ICONS.forEach(function(a){
     var d=document.createElement('div');d.className='appicon';
-    d.innerHTML='<div class="ico">'+a.emoji+'</div><div class="name">'+a.name+'</div>';
+    d.innerHTML='<div class="ico" style="background:'+a.bg+'">'+a.emoji+'</div><div class="name">'+a.name+'</div>';
     d.onclick=function(){openApp(a.id);};
     g.appendChild(d);
   });
   var dock=document.getElementById('dock');dock.innerHTML='';
   DOCK_ICONS.forEach(function(id){
-    var a=APP_ICONS.find(function(x){return x.id===id;});
+    var a=null;
+    for(var i=0;i<APP_ICONS.length;i++){if(APP_ICONS[i].id===id){a=APP_ICONS[i];break;}}
     var d=document.createElement('div');d.className='appicon';
-    d.innerHTML='<div class="ico">'+a.emoji+'</div><div class="name">'+a.name+'</div>';
+    d.innerHTML='<div class="ico" style="background:'+a.bg+'">'+a.emoji+'</div><div class="name">'+a.name+'</div>';
     d.onclick=function(){openApp(id);};
     dock.appendChild(d);
   });
 }
-var currentApp=null;
-function openApp(id){
-  currentApp=id;
-  document.querySelectorAll('.app').forEach(function(e){e.classList.remove('active');});
-  var el=document.getElementById('app-'+id);
-  if(el)el.classList.add('active');
-  if(id==='chat'){switchTab('msg');}
-  if(id==='shop')renderShop();
-  if(id==='gallery')renderGallery();
-  if(id==='music')renderMusic();
-  if(id==='video')renderVideo();
-  if(id==='settings')renderServices();
-}
-function closeApp(){
-  document.querySelectorAll('.app').forEach(function(e){e.classList.remove('active');});
-  stopAudio();hidePlayer();
-  currentApp=null;
-}
-/* 时钟 */
 function tick(){
   var n=new Date();
-  var h=n.getHours(),m=n.getMinutes();
-  var hm=(h<10?'0':'')+h+':'+(m<10?'0':'')+m;
+  var hm=(n.getHours()<10?'0':'')+n.getHours()+':'+(n.getMinutes()<10?'0':'')+n.getMinutes();
   document.getElementById('sbtime').textContent=hm;
   document.getElementById('clock').textContent=hm;
-  document.getElementById('date').textContent=n.getMonth()+1+'月'+n.getDate()+'日 星期'+'日一二三四五六'[n.getDay()];
+  document.getElementById('date').textContent=(n.getMonth()+1)+'月'+n.getDate()+'日 星期'+'日一二三四五六'[n.getDay()];
 }
-setInterval(tick,1000);tick();
 
-/* ========== AI 聊天 ========== */
+/* ========== 微信 · 四个标签页 ========== */
 var chatTab='msg';
-var curRoleId=null;
+var TABS=['msg','contacts','discover','me'];
 function switchTab(t){
   chatTab=t;
-  var tabs=document.querySelectorAll('#app-chat .chat-tabs div');
-  var order=['msg','roles','me'];
-  tabs.forEach(function(d,i){d.classList.toggle('on',order[i]===t);});
-  ['msg','roles','me'].forEach(function(p){
+  var tabs=document.querySelectorAll('#app-chat .chat-tabs .tab');
+  tabs.forEach(function(d,i){d.classList.toggle('on',TABS[i]===t);});
+  TABS.forEach(function(p){
     document.getElementById('pane-'+p).classList.toggle('on',p===t);
   });
-  renderChat();
+  renderChatPane();
 }
-function renderChat(){
+function renderChatPane(){
   if(chatTab==='msg')renderMsgPane();
-  else if(chatTab==='roles')renderRolesPane();
+  else if(chatTab==='contacts')renderContactsPane();
+  else if(chatTab==='discover')renderDiscoverPane();
   else renderMePane();
 }
-function fmtTime(ts){
-  var d=new Date(ts);var h=d.getHours(),m=d.getMinutes();
-  return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
-}
 function roleById(id){return db.roles.find(function(r){return r.id===id;});}
+
+/* —— 消息列表 —— */
 function renderMsgPane(){
   var p=document.getElementById('pane-msg');
-  var ids=Object.keys(db.chats).filter(function(id){var c=db.chats[id];return c.messages&&c.messages.length>0;});
+  var ids=Object.keys(db.chats).filter(function(id){
+    var c=db.chats[id];return c.messages&&c.messages.length>0&&roleById(id);
+  });
   ids.sort(function(a,b){
     var la=db.chats[a].messages[db.chats[a].messages.length-1].time;
     var lb=db.chats[b].messages[db.chats[b].messages.length-1].time;
     return lb-la;
   });
-  if(ids.length===0){p.innerHTML='<div class="empty"><div class="eico">💬</div>还没有聊天，去「联系人」找个角色聊聊吧</div>';return;}
+  if(ids.length===0){p.innerHTML='<div class="empty"><div class="eico">💬</div>还没有聊天<br>去「通讯录」找个 AI 好友聊聊吧</div>';return;}
   var html='';
   ids.forEach(function(id){
-    var r=roleById(id);if(!r)return;
+    var r=roleById(id);
     var c=db.chats[id];var last=c.messages[c.messages.length-1];
+    var pre=(last.role==='user'?'我：':'')+escapeHtml(last.content).replace(/\n/g,' ');
     html+='<div class="conv" onclick="openChat(\''+id+'\')">'
       +'<div class="av">'+r.avatar+'</div>'
-      +'<div class="mid"><div class="top"><span class="name">'+r.name+'</span><span class="time">'+fmtTime(last.time)+'</span></div>'
-      +'<div class="pre">'+(last.role==='ai'?'':'我：')+escapeHtml(last.content).slice(0,30)+'</div></div></div>';
+      +'<div class="mid"><div class="top"><span class="name">'+escapeHtml(r.name)+'</span><span class="time">'+fmtTime(last.time)+'</span></div>'
+      +'<div class="pre">'+pre.slice(0,40)+'</div></div></div>';
   });
   p.innerHTML=html;
 }
-function renderRolesPane(){
-  var p=document.getElementById('pane-roles');
-  if(db.roles.length===0){p.innerHTML='<div class="empty"><div class="eico">👥</div>还没有角色，点右上角＋创建</div>';return;}
-  var html='<div class="sec-label">AI 伙伴</div>';
-  db.roles.forEach(function(r){
-    html+='<div class="role-cell" onclick="openChat(\''+r.id+'\')">'
-      +'<div class="av">'+r.avatar+'</div><div><div class="name">'+r.name+'</div>'
-      +'<div class="desc">'+(r.prompt?escapeHtml(r.prompt).slice(0,26):'暂无描述')+'</div></div></div>';
+
+/* —— 通讯录 —— */
+var contactFilter='';
+function renderContactsPane(){
+  var p=document.getElementById('pane-contacts');
+  var html='<div class="wx-search"><input id="ct-search" placeholder="🔍 搜索好友" value="'+escapeHtml(contactFilter)+'"></div>';
+  html+='<div class="cell" style="margin-top:6px" onclick="toast(\'新的朋友功能开发中\')"><div class="cbox" style="background:#fa9d3b">👤</div><div class="ct">新的朋友</div><div class="arr">›</div></div>';
+  var kw=contactFilter.trim();
+  var list=db.roles.filter(function(r){
+    return !kw||r.name.indexOf(kw)>=0||(r.wxid||'').indexOf(kw)>=0;
   });
+  if(db.roles.length===0){
+    html+='<div class="empty"><div class="eico">👥</div>还没有 AI 好友<br>点右上角 ＋ 创建</div>';
+  }else{
+    html+='<div class="sec-label">AI 好友 · '+list.length+' 位</div>';
+    list.forEach(function(r){
+      html+='<div class="role-cell" onclick="openChat(\''+r.id+'\')">'
+        +'<div class="av">'+r.avatar+'</div><div style="flex:1;min-width:0">'
+        +'<div class="rname">'+escapeHtml(r.name)+'</div>'
+        +'<div class="rdesc">微信号：'+escapeHtml(r.wxid||'未设置')+'</div></div>'
+        +'<div class="arr" style="color:#c8c8c8">›</div></div>';
+    });
+    if(!list.length)html+='<div class="empty">没有匹配的好友</div>';
+  }
   p.innerHTML=html;
+  var inp=document.getElementById('ct-search');
+  if(inp){
+    inp.oninput=function(){
+      contactFilter=this.value;
+      renderContactsPane();
+      var ni=document.getElementById('ct-search');
+      ni.focus();
+      try{ni.setSelectionRange(ni.value.length,ni.value.length);}catch(e){}
+    };
+  }
 }
+
+/* —— 发现 —— */
+function renderDiscoverPane(){
+  var p=document.getElementById('pane-discover');
+  p.innerHTML='<div style="height:6px"></div>'
+   +'<div class="cell" onclick="toast(\'朋友圈功能开发中\')"><div class="cbox" style="background:#fa5151">🌈</div><div class="ct">朋友圈</div><div class="arr">›</div></div>'
+   +'<div class="cell" onclick="toast(\'视频号开发中\')"><div class="cbox" style="background:#ff7e29">🎬</div><div class="ct">视频号</div><div class="arr">›</div></div>'
+   +'<div class="cell" onclick="toast(\'直播开发中\')"><div class="cbox" style="background:#fa5151">📺</div><div class="ct">直播</div><div class="arr">›</div></div>'
+   +'<div class="menu-group"></div>'
+   +'<div class="cell" onclick="toast(\'扫一扫开发中\')"><div class="cbox" style="background:#3e7bfa">📷</div><div class="ct">扫一扫</div></div>'
+   +'<div class="cell" onclick="toast(\'摇一摇开发中\')"><div class="cbox" style="background:#3e7bfa">🎲</div><div class="ct">摇一摇</div></div>'
+   +'<div class="cell" onclick="toast(\'看一看开发中\')"><div class="cbox" style="background:#fa5151">👀</div><div class="ct">看一看</div></div>'
+   +'<div class="cell" onclick="toast(\'搜一搜开发中\')"><div class="cbox" style="background:#3e7bfa">🔍</div><div class="ct">搜一搜</div></div>'
+   +'<div class="menu-group"></div>'
+   +'<div class="cell" onclick="openApp(\'shop\')"><div class="cbox" style="background:#ff9d00">🛍️</div><div class="ct">购物 · 金币商城</div><div class="arr">›</div></div>'
+   +'<div class="cell" onclick="openApp(\'games\')"><div class="cbox" style="background:#07c160">🎮</div><div class="ct">游戏</div><div class="arr">›</div></div>'
+   +'<div class="cell" onclick="openApp(\'music\')"><div class="cbox" style="background:#a18cd1">🎵</div><div class="ct">音乐</div><div class="arr">›</div></div>'
+   +'<div class="cell" onclick="toast(\'小程序开发中\')"><div class="cbox" style="background:#07c160">🧩</div><div class="ct">小程序</div><div class="arr">›</div></div>';
+}
+
+/* —— 我 —— */
 function renderMePane(){
   var p=document.getElementById('pane-me');
-  var s=db.services[0];
-  var cur=s?('当前：'+s.name+' · '+s.model):'未配置';
-  p.innerHTML='<div class="panel" style="padding:16px">'
-    +'<div class="card"><div style="font-size:15px;font-weight:600">服务商</div>'
-    +'<div style="font-size:13px;color:#999;margin-top:6px">'+cur+'</div>'
-    +'<button class="btn blue" style="margin-top:12px" onclick="openApp(\'settings\')">管理服务商</button></div>'
-    +'<div class="hint">💡 提示：Key 只存在你自己的浏览器里，不会上传到别处。陌生人使用时可让他们在自己手机里配置自己的 Key。</div>'
-    +'</div>';
+  var pf=db.profile;
+  p.innerHTML='<div class="me-card" onclick="openProfile()">'
+   +'<div class="mav">'+pf.avatar+'</div>'
+   +'<div><div class="mname">'+escapeHtml(pf.name)+'</div>'
+   +'<div class="mwxid">微信号：'+escapeHtml(pf.wxid)+(pf.sign?' · '+escapeHtml(pf.sign):'')+'</div></div>'
+   +'<div class="arr">›</div></div>'
+   +'<div class="menu-group"></div>'
+   +'<div class="cell" onclick="toast(\'服务功能开发中\')"><div class="cbox" style="background:#07c160">💳</div><div class="ct">服务</div><div class="arr">›</div></div>'
+   +'<div class="cell" onclick="toast(\'收藏开发中\')"><div class="cbox" style="background:#fa9d3b">⭐</div><div class="ct">收藏</div><div class="arr">›</div></div>'
+   +'<div class="cell" onclick="toast(\'朋友圈开发中\')"><div class="cbox" style="background:#fa5151">🌈</div><div class="ct">朋友圈</div><div class="arr">›</div></div>'
+   +'<div class="cell" onclick="toast(\'卡包开发中\')"><div class="cbox" style="background:#3e7bfa">🗂️</div><div class="ct">卡包</div><div class="arr">›</div></div>'
+   +'<div class="cell" onclick="toast(\'表情开发中\')"><div class="cbox" style="background:#fdd835">😀</div><div class="ct">表情</div><div class="arr">›</div></div>'
+   +'<div class="menu-group"></div>'
+   +'<div class="cell" onclick="openApp(\'settings\')"><div class="cbox" style="background:#718093">⚙️</div><div class="ct">设置 · AI 服务商</div><div class="arr">›</div></div>'
+   +'<div class="cell" onclick="toast(\'掌上AI手机 V2 · 由 AI 全程代建\')"><div class="cbox" style="background:#3e7bfa">ℹ️</div><div class="ct">关于</div><div class="arr">›</div></div>';
 }
-function newChat(){chatTab='roles';switchTab('roles');}
+
+/* —— 个人资料 —— */
+function openProfile(){
+  var pf=db.profile;
+  document.getElementById('pf-avatar').value=pf.avatar;
+  document.getElementById('pf-name').value=pf.name;
+  document.getElementById('pf-wxid').value=pf.wxid;
+  document.getElementById('pf-sign').value=pf.sign||'';
+  openApp('profile');
+}
+function saveProfile(){
+  var av=document.getElementById('pf-avatar').value.trim();
+  var nm=document.getElementById('pf-name').value.trim();
+  var wx=document.getElementById('pf-wxid').value.trim();
+  var sg=document.getElementById('pf-sign').value.trim();
+  if(!nm){toast('请填写昵称');return;}
+  db.profile={avatar:av||'🙂',name:nm,wxid:wx||'wx_user',sign:sg};
+  save(db);
+  toast('已保存 ✓');
+  goBack();
+}/* ========== 角色（AI 好友） ========== */
 function editRole(id){
   var r=id?roleById(id):null;
-  document.getElementById('re-title').textContent=r?'编辑角色':'新建角色';
+  document.getElementById('re-title').textContent=r?'好友资料':'添加好友';
   document.getElementById('re-name').value=r?r.name:'';
   document.getElementById('re-avatar').value=r?r.avatar:'🤖';
+  document.getElementById('re-wxid').value=r?(r.wxid||''):'';
   document.getElementById('re-prompt').value=r?r.prompt:'';
   document.getElementById('re-greeting').value=r?r.greeting:'';
   document.getElementById('app-roledit')._editId=id||'';
@@ -513,47 +744,74 @@ function editRole(id){
 function saveRole(){
   var id=document.getElementById('app-roledit')._editId||('r'+Date.now());
   var name=document.getElementById('re-name').value.trim();
-  if(!name){alert('请填写角色名字');return;}
-  var role={id:id,name:name,avatar:document.getElementById('re-avatar').value.trim()||'🤖',
+  if(!name){toast('请填写名字');return;}
+  var role={
+    id:id,name:name,
+    avatar:document.getElementById('re-avatar').value.trim()||'🤖',
+    wxid:document.getElementById('re-wxid').value.trim(),
     prompt:document.getElementById('re-prompt').value.trim(),
-    greeting:document.getElementById('re-greeting').value.trim()};
-  var idx=db.roles.findIndex(function(r){return r.id===id;});
+    greeting:document.getElementById('re-greeting').value.trim()
+  };
+  var idx=-1;
+  for(var i=0;i<db.roles.length;i++){if(db.roles[i].id===id){idx=i;break;}}
   if(idx>=0)db.roles[idx]=role;else db.roles.push(role);
   save(db);
-  backToRoles();
+  toast('已保存 ✓');
+  goBack();
 }
-function backToRoles(){
-  openApp('chat');chatTab='roles';switchTab('roles');
-}
+
+/* ========== 聊天详情 ========== */
+var curRoleId=null;
 function openChat(roleId){
   curRoleId=roleId;
   var r=roleById(roleId);if(!r)return;
   if(!db.chats[roleId])db.chats[roleId]={messages:[]};
   document.getElementById('cd-title').textContent=r.name;
-  document.querySelectorAll('.app').forEach(function(e){e.classList.remove('active');});
-  document.getElementById('app-chatdetail').classList.add('active');
-  var body=document.getElementById('cd-body');body.innerHTML='';
-  var msgs=db.chats[roleId].messages;
-  if(msgs.length===0&&r.greeting){
-    msgs.push({role:'ai',content:r.greeting,time:Date.now()});
-    save(db);
-  }
-  msgs.forEach(function(m){appendMsg(m.role,m.content);});
-  body.scrollTop=body.scrollHeight;
-  setTimeout(function(){document.getElementById('cd-input').focus();},300);
+  openApp('chatdetail');
+  setTimeout(function(){document.getElementById('cd-input').focus();},250);
 }
-function backToList(){openApp('chat');renderChat();}
-function appendMsg(role,content){
-  var r=roleById(curRoleId);
-  var body=document.getElementById('cd-body');
+function timeLineDiv(ts){
+  var d=document.createElement('div');d.className='time-line';
+  d.textContent=fmtChatTime(ts);return d;
+}
+function msgDiv(role,content){
+  var r=curRoleId?roleById(curRoleId):null;
   var d=document.createElement('div');d.className='msg '+(role==='user'?'me':'ai');
-  d.innerHTML='<div class="av">'+(role==='user'?'🧑':(r?r.avatar:'🤖'))+'</div>'
-    +'<div class="bubble">'+escapeHtml(content)+'</div>';
+  var av=(role==='user')?(db.profile.avatar||'🙂'):(r?r.avatar:'🤖');
+  d.innerHTML='<div class="av">'+av+'</div><div class="bubble">'+escapeHtml(content)+'</div>';
+  return d;
+}
+function renderChatMsgs(){
+  var body=document.getElementById('cd-body');body.innerHTML='';
+  var msgs=(db.chats[curRoleId]&&db.chats[curRoleId].messages)||[];
+  if(msgs.length===0){
+    var r=roleById(curRoleId);
+    if(r&&r.greeting){
+      db.chats[curRoleId]={messages:[{role:'ai',content:r.greeting,time:Date.now()}]};
+      save(db);msgs=db.chats[curRoleId].messages;
+    }
+  }
+  var lastT=0;
+  msgs.forEach(function(m){
+    if(m.time-lastT>5*60000)body.appendChild(timeLineDiv(m.time));
+    lastT=m.time;
+    body.appendChild(msgDiv(m.role,m.content));
+  });
+  body.scrollTop=body.scrollHeight;
+}
+function appendMsg(role,content){
+  var body=document.getElementById('cd-body');
+  var msgs=db.chats[curRoleId].messages;
+  if(msgs.length>=2){
+    var a=msgs[msgs.length-2],b=msgs[msgs.length-1];
+    if(b.time-a.time>5*60000)body.appendChild(timeLineDiv(b.time));
+  }
+  var d=msgDiv(role,content);
   body.appendChild(d);body.scrollTop=body.scrollHeight;
   return d;
 }
 function send(){
-  if(!db.services.length){alert('请先在「我的→服务商」里配置 API Key');openApp('chat');return;}
+  if(!db.services.length){toast('请先到「我 → 设置」配置 AI 服务商');openApp('settings');return;}
   var input=document.getElementById('cd-input');
   var text=input.value.trim();if(!text)return;
   input.value='';
@@ -561,12 +819,6 @@ function send(){
   appendMsg('user',text);
   save(db);
   callAI(text);
-}
-function normUrl(u){
-  u=u.trim().replace(/\/+$/,'');
-  if(/\/chat\/completions$/.test(u))return u;
-  if(/\/v1$/.test(u))return u+'/chat/completions';
-  return u+'/chat/completions';
 }
 function callAI(userText){
   var svc=db.services[0];
@@ -576,11 +828,10 @@ function callAI(userText){
   d.innerHTML='<div class="av">'+(r?r.avatar:'🤖')+'</div><div class="bubble"><span class="cursor"></span></div>';
   body.appendChild(d);body.scrollTop=body.scrollHeight;
   var bubble=d.querySelector('.bubble');
-  // 组装消息历史
   var history=db.chats[curRoleId].messages.map(function(m){
     return {role:m.role==='user'?'user':'assistant',content:m.content};
   });
-  var sys=r&&r.prompt?r.prompt:'你是一个乐于助人的AI助手。';
+  var sys=(r&&r.prompt)?r.prompt:'你是一个乐于助人的AI助手。';
   var payload={
     model:svc.model,
     stream:true,
@@ -595,7 +846,7 @@ function callAI(userText){
     return readStream(res.body,bubble);
   }).then(function(){save(db);}).catch(function(err){
     bubble.classList.add('typing');
-    bubble.innerHTML='请求失败：'+escapeHtml(err.message)+'（检查服务商地址/Key/模型名）';
+    bubble.innerHTML='请求失败：'+escapeHtml(err.message)+'（检查服务商地址 / Key / 模型名，或该服务是否支持跨域直连）';
   });
 }
 function readStream(body,bubble){
@@ -615,8 +866,12 @@ function readStream(body,bubble){
         try{
           var j=JSON.parse(data);
           var delta=j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content;
-          if(delta){full+=delta;bubble.innerHTML=escapeHtml(full)+'<span class="cursor"></span>';
-            document.getElementById('cd-body').scrollTop=document.getElementById('cd-body').scrollHeight;}
+          if(delta){
+            full+=delta;
+            bubble.innerHTML=escapeHtml(full)+'<span class="cursor"></span>';
+            var bd=document.getElementById('cd-body');
+            bd.scrollTop=bd.scrollHeight;
+          }
         }catch(e){}
       });
       return process();
@@ -631,21 +886,21 @@ function readStream(body,bubble){
     }
   });
 }
-function escapeHtml(s){
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}/* ========== 服务商设置 ========== */
+
+/* ========== 服务商（含测试连接） ========== */
 function renderServices(){
   var list=document.getElementById('svc-list');list.innerHTML='';
-  if(db.services.length===0){list.innerHTML='<div class="empty"><div class="eico">🔑</div>还没有服务商</div>';return;}
+  if(db.services.length===0){
+    list.innerHTML='<div class="empty"><div class="eico">🔑</div>还没有服务商<br>点下方按钮添加</div>';return;
+  }
   db.services.forEach(function(s,idx){
-    var c=document.createElement('div');c.className='card';
-    c.innerHTML='<div style="display:flex;align-items:center;gap:10px">'
-      +'<div style="flex:1"><div style="font-size:15px;font-weight:600">'+escapeHtml(s.name)+(idx===0?' <span style="color:var(--green);font-size:11px">当前</span>':'')+'</div>'
-      +'<div style="font-size:12px;color:#999;margin-top:3px">'+escapeHtml(s.model)+'</div></div>'
-      +'<button class="btn blue" style="width:auto;padding:7px 12px;margin:0" onclick="useService('+idx+')">'+(idx===0?'使用中':'启用')+'</button>'
-      +'<button class="btn gray" style="width:auto;padding:7px 12px;margin:0" onclick="editService('+idx+')">编辑</button>'
-      +'<button class="btn warn" style="width:auto;padding:7px 12px;margin:0" onclick="delService('+idx+')">删</button>'
-      +'</div>';
+    var c=document.createElement('div');c.className='cell';
+    c.innerHTML='<div class="cbox" style="background:'+(idx===0?'#07c160':'#8395a7')+'">'+(idx===0?'✓':'🔗')+'</div>'
+      +'<div class="ct" style="min-width:0"><div style="font-weight:600">'+escapeHtml(s.name)+'</div>'
+      +'<div style="font-size:12px;color:#999;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escapeHtml(s.model)+'</div></div>'
+      +'<button class="btn small '+(idx===0?'gray':'blue')+'" onclick="useService('+idx+')">'+(idx===0?'使用中':'启用')+'</button>'
+      +'<button class="btn small gray" onclick="editService('+idx+')">编辑</button>'
+      +'<button class="btn small warn" onclick="delService('+idx+')">删</button>';
     list.appendChild(c);
   });
 }
@@ -660,24 +915,51 @@ function editService(idx){
   document.getElementById('svc-url').value=s?s.url:'';
   document.getElementById('svc-key').value=s?s.key:'';
   document.getElementById('svc-model').value=s?s.model:'';
-  document.getElementById('app-svcedit')._editIdx=idx;
+  document.getElementById('svc-test-result').textContent='';
+  document.getElementById('app-svcedit')._editIdx=(idx===undefined)?null:idx;
   openApp('svcedit');
+}
+function testService(){
+  var url=document.getElementById('svc-url').value.trim();
+  var key=document.getElementById('svc-key').value.trim();
+  var model=document.getElementById('svc-model').value.trim();
+  var r=document.getElementById('svc-test-result');
+  if(!url||!key||!model){toast('请先填好地址 / Key / 模型名');return;}
+  r.innerHTML='⏳ 正在测试连接…';
+  var btn=document.getElementById('svc-test-btn');btn.disabled=true;
+  fetch(normUrl(url),{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({model:model,messages:[{role:'user',content:'你好'}],max_tokens:10})
+  }).then(function(res){
+    return res.json().then(function(j){return {status:res.status,j:j};});
+  }).then(function(o){
+    btn.disabled=false;
+    if(o.status===200&&o.j&&o.j.choices){
+      r.innerHTML='<span style="color:var(--green)">✅ 连接成功！模型正常响应</span>';
+    }else{
+      var em=(o.j&&o.j.error&&o.j.error.message)?o.j.error.message:('HTTP '+o.status);
+      r.innerHTML='<span style="color:#fa5151">❌ 失败：'+escapeHtml(em)+'</span>';
+    }
+  }).catch(function(e){
+    btn.disabled=false;
+    r.innerHTML='<span style="color:#fa5151">❌ 网络错误：'+escapeHtml(e.message)+'（检查地址是否正确，或该服务是否支持浏览器直连）</span>';
+  });
 }
 function saveService(){
   var name=document.getElementById('svc-name').value.trim();
   var url=document.getElementById('svc-url').value.trim();
   var key=document.getElementById('svc-key').value.trim();
   var model=document.getElementById('svc-model').value.trim();
-  if(!name||!url||!key||!model){alert('请填完整（名称/地址/Key/模型名）');return;}
+  if(!name||!url||!key||!model){toast('请填完整（名称/地址/Key/模型名）');return;}
   var s={name:name,url:url,key:key,model:model};
   var idx=document.getElementById('app-svcedit')._editIdx;
   if(idx===null||idx===undefined){db.services.push(s);}else{db.services[idx]=s;}
-  save(db);backToSvc();
+  save(db);
+  toast('已保存 ✓');
+  goBack();
 }
-function delService(idx){db.services.splice(idx,1);save(db);renderServices();}
-function backToSvc(){openApp('settings');renderServices();}
-
-/* ========== 商城 ========== */
+function delService(idx){db.services.splice(idx,1);save(db);renderServices();}/* ========== 商城 ========== */
 var GOODS=[
   {id:'g1',name:'虚拟奶茶',emoji:'🧋',price:8},
   {id:'g2',name:'云朵抱枕',emoji:'☁️',price:30},
@@ -688,24 +970,23 @@ var GOODS=[
   {id:'g7',name:'魔法棒',emoji:'🪄',price:99},
   {id:'g8',name:'甜甜圈',emoji:'🍩',price:6}
 ];
-var shopTab='goods';
-function shopTab(t){shopTab=t;renderShop();}
+var shopTabName='goods';
+function shopTab(t){shopTabName=t;renderShop();}
 function renderShop(){
   document.getElementById('shop-coin').textContent=db.coins;
   var g=document.getElementById('shop-goods');
-  var tabs=document.querySelectorAll('#app-shop .chat-tabs div');
-  tabs.forEach(function(d,i){d.classList.toggle('on',(i===0&&shopTab==='goods')||(i===1&&shopTab==='cart'));});
-  if(shopTab==='goods'){
+  var tabs=document.querySelectorAll('#app-shop .chat-tabs .tab');
+  tabs.forEach(function(d,i){d.classList.toggle('on',(i===0&&shopTabName==='goods')||(i===1&&shopTabName==='cart'));});
+  if(shopTabName==='goods'){
     var html='';
     GOODS.forEach(function(gd){
       html+='<div class="goods" onclick="buy(\''+gd.id+'\')"><div class="gimg">'+gd.emoji+'</div>'
-        +'<div class="gname">'+gd.name+'</div><div class="gprice">'+gd.price+' <span class="coin">金币</span></div></div>';
+        +'<div class="gname">'+gd.name+'</div><div class="gprice">'+gd.price+' 金币</div></div>';
     });
     g.innerHTML=html;
   }else{
     if(db.cart.length===0){g.innerHTML='<div class="empty"><div class="eico">🛒</div>购物车是空的</div>';return;}
-    var html='';
-    var total=0;
+    var html='';var total=0;
     db.cart.forEach(function(c,i){
       total+=c.price*c.qty;
       html+='<div class="cart-row"><span style="font-size:26px">'+c.emoji+'</span>'
@@ -713,7 +994,7 @@ function renderShop(){
         +'<div class="qty"><button onclick="chgQty('+i+',-1)">−</button><span>'+c.qty+'</span><button onclick="chgQty('+i+',1)">＋</button></div></div>';
     });
     html+='<div style="padding:14px;text-align:right">合计：<b style="color:#fa5151;font-size:18px">'+total+'</b> 金币</div>';
-    html+='<button class="btn" style="margin:0 12px 16px" onclick="checkout()">立即结算（模拟支付）</button>';
+    html+='<button class="btn" style="margin:0 12px 16px;width:auto" onclick="checkout()">立即结算（模拟支付）</button>';
     g.innerHTML=html;
   }
 }
@@ -722,25 +1003,28 @@ function buy(id){
   var c=db.cart.find(function(x){return x.id===id;});
   if(c)c.qty++;else db.cart.push({id:gd.id,name:gd.name,emoji:gd.emoji,price:gd.price,qty:1});
   save(db);
-  shopTab='cart';renderShop();
+  shopTabName='cart';renderShop();
 }
 function chgQty(i,d){db.cart[i].qty+=d;if(db.cart[i].qty<=0)db.cart.splice(i,1);save(db);renderShop();}
 function checkout(){
   var total=0;db.cart.forEach(function(c){total+=c.price*c.qty;});
-  if(total===0){alert('购物车是空的');return;}
-  if(db.coins<total){alert('金币不足！');return;}
-  db.coins-=total;db.orders.push({items:db.cart.slice(),total:total,time:Date.now()});
-  db.cart=[];save(db);
+  if(total===0){toast('购物车是空的');return;}
+  if(db.coins<total){toast('金币不足！');return;}
+  db.coins-=total;
+  db.orders.push({items:db.cart.slice(),total:total,time:Date.now()});
   var names=db.orders[db.orders.length-1].items.map(function(c){return c.emoji+c.name+'×'+c.qty;}).join('、');
-  alert('✅ 支付成功（模拟）！\n购买：'+names+'\n这是虚拟商品，不会真的发货哦');
+  db.cart=[];save(db);
+  toast('✅ 支付成功（模拟）：'+names+'，虚拟商品不发货哦');
   renderShop();
 }
 
 /* ========== 相册 ========== */
 function renderGallery(){
   var g=document.getElementById('gal-grid');g.innerHTML='';
-  var add='<div class="gal-add" onclick="document.getElementById(\'gal-file\').click()"><span style="font-size:26px">＋</span>添加照片</div>';
-  g.innerHTML=add;
+  var add=document.createElement('div');add.className='gal-add';
+  add.innerHTML='<span style="font-size:26px">＋</span>添加照片';
+  add.onclick=function(){document.getElementById('gal-file').click();};
+  g.appendChild(add);
   db.gallery.forEach(function(src,i){
     var d=document.createElement('div');d.className='ph';
     d.style.backgroundImage='url('+src+')';
@@ -750,15 +1034,18 @@ function renderGallery(){
 }
 function showPhoto(i){
   var src=db.gallery[i];
-  var w=window.open('', '_blank');
+  var w=window.open('','_blank');
   if(w){w.document.write('<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;background:#000;display:flex;align-items:center;justify-content:center;height:100vh}img{max-width:100%;max-height:100%}</style></head><body><img src="'+src+'"></body></html>');}
 }
 document.getElementById('gal-file').addEventListener('change',function(e){
   var files=e.target.files;
   for(var i=0;i<files.length;i++){
-    var r=new FileReader();
-    r.onload=function(ev){db.gallery.push(ev.target.result);save(db);renderGallery();};
-    r.readAsDataURL(files[i]);
+    var f=files[i];
+    (function(file){
+      var r=new FileReader();
+      r.onload=function(ev){db.gallery.push(ev.target.result);save(db);renderGallery();};
+      r.readAsDataURL(file);
+    })(f);
   }
   this.value='';
 });
@@ -774,16 +1061,16 @@ def(db,'musicLocal',[]);
 var audio=document.getElementById('audio');
 function renderMusic(){
   var on=document.getElementById('music-online');on.innerHTML='';
-  ONLINE_MUSIC.forEach(function(m,i){
+  ONLINE_MUSIC.forEach(function(m){
     var d=document.createElement('div');d.className='media-item';
     d.innerHTML='<div class="mic">🎵</div><div><div class="name">'+m.name+'</div><div class="sub">在线免费素材</div></div>';
     d.onclick=function(){playAudio(m.src,m.name);};
     on.appendChild(d);
   });
   var loc=document.getElementById('music-local');loc.innerHTML='';
-  db.musicLocal.forEach(function(m,i){
+  db.musicLocal.forEach(function(m){
     var d=document.createElement('div');d.className='media-item';
-    d.innerHTML='<div class="mic">🎵</div><div><div class="name">'+m.name+'</div><div class="sub">本地音乐</div></div>';
+    d.innerHTML='<div class="mic">🎵</div><div><div class="name">'+escapeHtml(m.name)+'</div><div class="sub">本地音乐</div></div>';
     d.onclick=function(){playAudio(m.src,m.name);};
     loc.appendChild(d);
   });
@@ -793,9 +1080,11 @@ function playAudio(src,name){
   document.getElementById('player-title').textContent=name;
   document.getElementById('player').style.display='flex';
 }
-function togglePlay(){if(audio.paused){audio.play();document.getElementById('player-btn').textContent='⏸';}else{audio.pause();document.getElementById('player-btn').textContent='▶';}}
-function stopAudio(){audio.pause();audio.removeAttribute('src');}
-function hidePlayer(){document.getElementById('player').style.display='none';}
+function togglePlay(){
+  if(audio.paused){audio.play();document.getElementById('player-btn').textContent='⏸';}
+  else{audio.pause();document.getElementById('player-btn').textContent='▶';}
+}
+function stopAudio(){audio.pause();}
 document.getElementById('music-file').addEventListener('change',function(e){
   var files=e.target.files;
   for(var i=0;i<files.length;i++){
@@ -818,22 +1107,22 @@ var ONLINE_VIDEO=[
 def(db,'videoLocal',[]);
 function renderVideo(){
   var on=document.getElementById('video-online');on.innerHTML='';
-  ONLINE_VIDEO.forEach(function(v,i){
+  ONLINE_VIDEO.forEach(function(v){
     var d=document.createElement('div');d.className='media-item';
     d.innerHTML='<div class="mic">🎬</div><div><div class="name">'+v.name+'</div><div class="sub">在线免费素材</div></div>';
     d.onclick=function(){playVideo(v.src,v.name);};
     on.appendChild(d);
   });
   var loc=document.getElementById('video-local');loc.innerHTML='';
-  db.videoLocal.forEach(function(v,i){
+  db.videoLocal.forEach(function(v){
     var d=document.createElement('div');d.className='media-item';
-    d.innerHTML='<div class="mic">🎬</div><div><div class="name">'+v.name+'</div><div class="sub">本地视频</div></div>';
+    d.innerHTML='<div class="mic">🎬</div><div><div class="name">'+escapeHtml(v.name)+'</div><div class="sub">本地视频</div></div>';
     d.onclick=function(){playVideo(v.src,v.name);};
     loc.appendChild(d);
   });
 }
 function playVideo(src,name){
-  var w=window.open('', '_blank');
+  var w=window.open('','_blank');
   if(w){w.document.write('<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+name+'</title><style>body{margin:0;background:#000;display:flex;align-items:center;justify-content:center;height:100vh}video{max-width:100%;max-height:100%}</style></head><body><video controls autoplay src="'+src+'"></video></body></html>');}
 }
 document.getElementById('video-file').addEventListener('change',function(e){
@@ -853,16 +1142,20 @@ function openGame(id){
   if(id==='snake')startSnake();
   if(id==='2048')start2048();
 }
-function backToGames(){openApp('games');}
 function startSnake(){
   if(snake&&snake.timer)clearInterval(snake.timer);
   var cv=document.getElementById('snake'),ctx=cv.getContext('2d');
   var N=20,cell=cv.width/N;
   snake={dir:[1,0],next:[1,0],sn:[[10,10]],food:[15,15],score:0,timer:null,dead:false};
-  function placeFood(){var f;do{f=[Math.floor(Math.random()*N),Math.floor(Math.random()*N)];}while(snake.sn.some(function(p){return p[0]===f[0]&&p[1]===f[1];}));snake.food=f;}
+  function placeFood(){
+    var f;
+    do{f=[Math.floor(Math.random()*N),Math.floor(Math.random()*N)];}
+    while(snake.sn.some(function(p){return p[0]===f[0]&&p[1]===f[1];}));
+    snake.food=f;
+  }
   function draw(){
     ctx.fillStyle='#111';ctx.fillRect(0,0,cv.width,cv.height);
-    ctx.fillStyle='#f00';ctx.fillRect(snake.food[0]*cell,snake.food[1]*cell,cell-2,cell-2);
+    ctx.fillStyle='#ff4d4f';ctx.fillRect(snake.food[0]*cell,snake.food[1]*cell,cell-2,cell-2);
     ctx.fillStyle='#6ee76e';
     snake.sn.forEach(function(p){ctx.fillRect(p[0]*cell,p[1]*cell,cell-2,cell-2);});
   }
@@ -873,12 +1166,13 @@ function startSnake(){
     if(nh[0]<0||nh[0]>=N||nh[1]<0||nh[1]>=N||snake.sn.some(function(p){return p[0]===nh[0]&&p[1]===nh[1];})){
       snake.dead=true;clearInterval(snake.timer);
       ctx.fillStyle='#fff';ctx.font='20px sans-serif';ctx.textAlign='center';
-      ctx.fillText('游戏结束，得分'+snake.score,cv.width/2,cv.height/2);
+      ctx.fillText('游戏结束 得分'+snake.score,cv.width/2,cv.height/2);
       return;
     }
     snake.sn.unshift(nh);
-    if(nh[0]===snake.food[0]&&nh[1]===snake.food[1]){snake.score++;document.getElementById('snake-score').textContent=snake.score+'分';placeFood();}
-    else snake.sn.pop();
+    if(nh[0]===snake.food[0]&&nh[1]===snake.food[1]){
+      snake.score++;document.getElementById('snake-score').textContent=snake.score+'分';placeFood();
+    }else snake.sn.pop();
     draw();
   }
   placeFood();draw();
@@ -897,6 +1191,7 @@ function startSnake(){
     else if(k===39)snake.next=[1,0];else if(k===40)snake.next=[0,1];
   };
 }
+
 /* ========== 游戏：2048 ========== */
 var g2048=null;
 function start2048(){
@@ -918,7 +1213,8 @@ function start2048(){
 }
 function reset2048(){start2048();}
 function addTile(){
-  var empty=[];for(var i=0;i<4;i++)for(var j=0;j<4;j++)if(g2048.grid[i][j]===0)empty.push([i,j]);
+  var empty=[];
+  for(var i=0;i<4;i++)for(var j=0;j<4;j++)if(g2048.grid[i][j]===0)empty.push([i,j]);
   if(!empty.length)return;
   var p=empty[Math.floor(Math.random()*empty.length)];
   g2048.grid[p[0]][p[1]]=Math.random()<0.9?2:4;
@@ -931,15 +1227,18 @@ function draw2048(){
     row.forEach(function(v,j){
       var t=document.createElement('div');t.className='tile';
       t.style.left=(10+j*cell)+'px';t.style.top=(10+i*cell)+'px';
-      t.style.width=cell+'px';t.style.height=cell+'px';t.style.lineHeight=cell+'px';
-      if(v>0){t.textContent=v;t.style.background=TILE_COLOR[v]||'#3c3a32';if(v>=8)t.style.color='#fff';}
+      t.style.width=cell+'px';t.style.height=cell+'px';
+      if(v>0){
+        t.textContent=v;t.style.background=TILE_COLOR[v]||'#3c3a32';
+        if(v>=8)t.style.color='#fff';
+        t.style.display='flex';t.style.alignItems='center';t.style.justifyContent='center';
+      }
       el.appendChild(t);
     });
   });
   document.getElementById('score2048').textContent='分数：'+g2048.score;
 }
 function move2048(dir){
-  // dir: 0=上,1=右,2=下,3=左
   var g=g2048.grid,moved=false;
   function lineCells(fixed){
     var cells=[];
@@ -970,6 +1269,8 @@ function move2048(dir){
 }
 /* ========== 初始化 ========== */
 renderHome();
+tick();
+setInterval(tick,1000);
 </script>
 </body>
 </html>
